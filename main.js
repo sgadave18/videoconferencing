@@ -91,38 +91,6 @@ let init = async () => {
 }
 
 
-// let handleUserLeft = (MemberId) => {
-//     document.getElementById('user-2').style.display = 'none'
-//     document.getElementById('user-1').classList.remove('smallFrame')
-// }
-
-// let handleMessageFromPeer = async (message, MemberId) => {
-
-//     message = JSON.parse(message.text)
-
-//     if (message.type === 'offer') {
-//         createAnswer(MemberId, message.offer)
-//     }
-
-//     if (message.type === 'answer') {
-//         addAnswer(message.answer)
-//     }
-
-//     if (message.type === 'candidate') {
-//         if (peerConnection) {
-//             peerConnection.addIceCandidate(message.candidate)
-//         }
-//     }
-
-
-// }
-
-// let handleUserJoined = async (MemberId) => {
-//     console.log('A new user joined the channel:', MemberId)
-//     createOffer(MemberId)
-// }
-
-
 let createPeerConnection = async (MemberId) => {
 
     peerConnection = new RTCPeerConnection(servers)
