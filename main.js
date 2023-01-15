@@ -4,7 +4,6 @@ let authUsers = ['Swapnil', 'Swappy']
 
 let token = null;
 
-
 let client;
 let channel;
 
@@ -24,7 +23,6 @@ if (authUsers.includes(uid)) {
 
 let localStream;
 let remoteStream;
-
 
 const servers = {
     iceServers: [
@@ -82,14 +80,11 @@ let init = async () => {
                 peerConnection.addIceCandidate(message.candidate)
             }
         }
-
-
     })
 
     localStream = await navigator.mediaDevices.getUserMedia(constraints)
     document.getElementById('user-1').srcObject = localStream
 }
-
 
 let createPeerConnection = async (MemberId) => {
 
@@ -103,7 +98,7 @@ let createPeerConnection = async (MemberId) => {
 
     if (!localStream) {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-        document.getElementById('user-1').srcObject = localStream
+        document.getElementById('user-1').srcObject = new MediaStream(localStream.getVideoTracks())
     }
 
     localStream.getTracks().forEach((track) => {
@@ -184,7 +179,5 @@ let toggleMic = async () => {
 
 window.addEventListener('beforeunload', leaveChannel)
 
-// document.getElementById('camera-btn').setAttribute('onclick', `${toggleCamera}`)
-// document.getElementById('mic-btn').setAttribute('onclick', `${toggleMic}`)
 
 init()
