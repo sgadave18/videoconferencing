@@ -22,8 +22,10 @@ if (authUsers.includes(uid)) {
     console.log(uid);
 }
 
-let localStream;
-let remoteStream;
+let localVideoStream;
+let localAudioStream;
+let remoteVideoStream;
+let remoteAudioStream;
 
 
 const servers = {
@@ -58,9 +60,9 @@ let init = async () => {
 
 
     channel.on('MemberLeft', (MemberId) => {
-        console.log("Member Left : ",MemberId)
-        document.getElementById('user-2').style.display = 'none'
-        document.getElementById('user-1').classList.remove('smallFrame')
+        console.log("Member Left : ", MemberId)
+        document.getElementById('user2v').style.display = 'none'
+        document.getElementById('user1v').classList.remove('smallFrame')
     })
 
 
@@ -83,11 +85,23 @@ let init = async () => {
             }
         }
 
-
+//audioRemoteUser
     })
 
-    localStream = await navigator.mediaDevices.getUserMedia(constraints)
-    document.getElementById('user-1').srcObject = localStream
+    await navigator.mediaDevices.getUserMedia(constraints).then((streams) => {
+        localAudioStream = streams.getAudioTracks();
+        let localVideoStreamTrack = streams.getVideoTracks();
+        localVideoStream = new MediaStream(localVideoStreamTrack);
+        console.log("STREAM****",streams);
+        // localVideoStream.forEach((track)=>{
+            document.getElementById('user1v').srcObject = localVideoStream;
+            // console.log("VIDEO TRACKS****",track);
+        // });
+        // document.getElementById('user1a').srcObject = localAudioStream
+    }).catch((err)=>{
+        console.log(err)
+    })
+
 }
 
 
@@ -126,26 +140,46 @@ let init = async () => {
 let createPeerConnection = async (MemberId) => {
 
     peerConnection = new RTCPeerConnection(servers)
-    remoteStream = new MediaStream()
-    document.getElementById('user-2').srcObject = remoteStream
-    document.getElementById('user-2').style.display = 'block'
+    let remoteStream = new MediaStream();
+    remoteVideoStream = remoteStream.getVideoTracks();
+    remoteAudioStream = remoteStream.getAudioTracks();
+    document.getElementById('user2v').srcObject = remoteVideoStream
+    document.getElementById('audioRemoteUser').srcObject = remoteAudioStream
+    document.getElementById('user2v').style.display = 'block'
 
-    document.getElementById('user-1').classList.add('smallFrame')
+    document.getElementById('user1v').classList.add('smallFrame')
 
 
     if (!localStream) {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-        document.getElementById('user-1').srcObject = localStream
+        await navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then((streams) => {
+            console.log("STREAM ----",streams);
+            localAudioStream = streams.getAudioTracks();
+            localVideoStream = streams.getVideoTracks();
+            document.getElementById('user1v').srcObject = localVideoStream;
+            // document.getElementById('user1a').srcObject = localAudioStream
+        }).catch((err) => {
+            console.log(err)
+        })
     }
 
-    localStream.getTracks().forEach((track) => {
-        peerConnection.addTrack(track, localStream)
+    localAudioStream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, localAudioStream)
+    })
+
+    localVideoStream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, localVideoStream)
     })
 
     peerConnection.ontrack = (event) => {
-        event.streams[0].getTracks().forEach((track) => {
-            remoteStream.addTrack(track)
+        event.streams[0].getAudioTracks().forEach((track)=>{
+            remoteAudioStream.addTrack(track);
         })
+        event.streams[0].getVideoTracks().forEach((track)=>{
+            remoteVideoStream.addTrack(track);
+        })
+        // event.streams[0].getTracks().forEach((track) => {
+        //     remoteStream.addTrack(track)
+        // })
     }
 
     peerConnection.onicecandidate = async (event) => {
@@ -190,7 +224,7 @@ let leaveChannel = async () => {
 }
 
 let toggleCamera = async () => {
-    let videoTrack = localStream.getTracks().find(track => track.kind === 'video')
+    let videoTrack = localVideoStream//.getTracks().find(track => track.kind === 'video')
     console.log("Video TRACK", videoTrack)
     if (videoTrack.enabled) {
         videoTrack.enabled = false
@@ -203,7 +237,7 @@ let toggleCamera = async () => {
 
 let toggleMic = async () => {
 
-    let audioTrack = localStream.getTracks().find(track => track.kind === 'audio')
+    let audioTrack = localAudioStream//.getTracks().find(track => track.kind === 'audio')
     console.log("AUDIO TRACK", audioTrack)
     if (audioTrack.enabled) {
         audioTrack.enabled = false
