@@ -1,4 +1,5 @@
-const APP_ID = "38f99d48b8054706bb4ba6d7c03845ae"
+let APP_ID = "38f99d48b8054706bb4ba6d7c03845ae"
+
 
 let token = null;
 let uid = String(Math.floor(Math.random() * 10000))
@@ -8,9 +9,11 @@ let channel;
 
 let queryString = window.location.search
 let urlParams = new URLSearchParams(queryString)
-let roomId = 'main'
+let roomId = urlParams.get('room')
 
-
+if(!roomId){
+    window.location = 'lobby.html'
+}
 
 let localStream;
 let remoteStream;
@@ -46,13 +49,13 @@ let init = async () => {
     client.on('MessageFromPeer', handleMessageFromPeer)
 
     localStream = await navigator.mediaDevices.getUserMedia(constraints)
-    document.getElementById('user1').srcObject = localStream
+    document.getElementById('user-1').srcObject = localStream
 }
  
 
 let handleUserLeft = (MemberId) => {
-    document.getElementById('user2').style.display = 'none'
-    document.getElementById('user1').classList.remove('smallFrame')
+    document.getElementById('user-2').style.display = 'none'
+    document.getElementById('user-1').classList.remove('smallFrame')
 }
 
 let handleMessageFromPeer = async (message, MemberId) => {
@@ -86,15 +89,15 @@ let createPeerConnection = async (MemberId) => {
     peerConnection = new RTCPeerConnection(servers)
 
     remoteStream = new MediaStream()
-    document.getElementById('user2').srcObject = remoteStream
-    document.getElementById('user2').style.display = 'block'
+    document.getElementById('user-2').srcObject = remoteStream
+    document.getElementById('user-2').style.display = 'block'
 
-    document.getElementById('user1').classList.add('smallFrame')
+    document.getElementById('user-1').classList.add('smallFrame')
 
 
     if(!localStream){
         localStream = await navigator.mediaDevices.getUserMedia({video:true, audio:false})
-        document.getElementById('user1').srcObject = localStream
+        document.getElementById('user-1').srcObject = localStream
     }
 
     localStream.getTracks().forEach((track) => {
@@ -172,9 +175,9 @@ let toggleMic = async () => {
     }
 }
   
-// window.addEventListener('beforeunload', leaveChannel)
+window.addEventListener('beforeunload', leaveChannel)
 
-// document.getElementById('camera-btn').addEventListener('click', toggleCamera)
-// document.getElementById('mic-btn').addEventListener('click', toggleMic)
+document.getElementById('camera-btn').addEventListener('click', toggleCamera)
+document.getElementById('mic-btn').addEventListener('click', toggleMic)
 
 init()
