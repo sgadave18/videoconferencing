@@ -51,46 +51,76 @@ let init = async () => {
     channel = client.createChannel(roomId)
     await channel.join()
 
-    channel.on('MemberJoined', handleUserJoined)
-    channel.on('MemberLeft', handleUserLeft)
+    channel.on('MemberJoined', async (MemberId) => {
+        console.log('A new user joined the channel:', MemberId)
+        createOffer(MemberId)
+    })
 
-    client.on('MessageFromPeer', handleMessageFromPeer)
+
+    channel.on('MemberLeft', (MemberId) => {
+        console.log("Member Left : ",MemberId)
+        document.getElementById('user-2').style.display = 'none'
+        document.getElementById('user-1').classList.remove('smallFrame')
+    })
+
+
+
+    client.on('MessageFromPeer', async (message, MemberId) => {
+
+        message = JSON.parse(message.text)
+
+        if (message.type === 'offer') {
+            createAnswer(MemberId, message.offer)
+        }
+
+        if (message.type === 'answer') {
+            addAnswer(message.answer)
+        }
+
+        if (message.type === 'candidate') {
+            if (peerConnection) {
+                peerConnection.addIceCandidate(message.candidate)
+            }
+        }
+
+
+    })
 
     localStream = await navigator.mediaDevices.getUserMedia(constraints)
     document.getElementById('user-1').srcObject = localStream
 }
 
 
-let handleUserLeft = (MemberId) => {
-    document.getElementById('user-2').style.display = 'none'
-    document.getElementById('user-1').classList.remove('smallFrame')
-}
+// let handleUserLeft = (MemberId) => {
+//     document.getElementById('user-2').style.display = 'none'
+//     document.getElementById('user-1').classList.remove('smallFrame')
+// }
 
-let handleMessageFromPeer = async (message, MemberId) => {
+// let handleMessageFromPeer = async (message, MemberId) => {
 
-    message = JSON.parse(message.text)
+//     message = JSON.parse(message.text)
 
-    if (message.type === 'offer') {
-        createAnswer(MemberId, message.offer)
-    }
+//     if (message.type === 'offer') {
+//         createAnswer(MemberId, message.offer)
+//     }
 
-    if (message.type === 'answer') {
-        addAnswer(message.answer)
-    }
+//     if (message.type === 'answer') {
+//         addAnswer(message.answer)
+//     }
 
-    if (message.type === 'candidate') {
-        if (peerConnection) {
-            peerConnection.addIceCandidate(message.candidate)
-        }
-    }
+//     if (message.type === 'candidate') {
+//         if (peerConnection) {
+//             peerConnection.addIceCandidate(message.candidate)
+//         }
+//     }
 
 
-}
+// }
 
-let handleUserJoined = async (MemberId) => {
-    console.log('A new user joined the channel:', MemberId)
-    createOffer(MemberId)
-}
+// let handleUserJoined = async (MemberId) => {
+//     console.log('A new user joined the channel:', MemberId)
+//     createOffer(MemberId)
+// }
 
 
 let createPeerConnection = async (MemberId) => {
@@ -161,7 +191,7 @@ let leaveChannel = async () => {
 
 let toggleCamera = async () => {
     let videoTrack = localStream.getTracks().find(track => track.kind === 'video')
-    console.log("Video TRACK",videoTrack)
+    console.log("Video TRACK", videoTrack)
     if (videoTrack.enabled) {
         videoTrack.enabled = false
         document.getElementById('camera-btn').style.backgroundColor = 'rgb(255, 80, 80)'
@@ -172,9 +202,9 @@ let toggleCamera = async () => {
 }
 
 let toggleMic = async () => {
-    
+
     let audioTrack = localStream.getTracks().find(track => track.kind === 'audio')
-    console.log("AUDIO TRACK",audioTrack)
+    console.log("AUDIO TRACK", audioTrack)
     if (audioTrack.enabled) {
         audioTrack.enabled = false
         document.getElementById('mic-btn').style.backgroundColor = 'rgb(255, 80, 80)'
