@@ -6,6 +6,7 @@
     <title>PeerChat</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+    <link rel="icon" href="favicon.ico" />
 </head>
 <body>
 
@@ -16,13 +17,13 @@
 
     <div id="controls">
 
-        <div class="control-container" id="camera-btn">
+        <button class="control-container" id="camera-btn" onClick="toggleCamera()">
             <img src="icons/camera.png" />
-        </div>
+        </button>
 
-        <div class="control-container" id="mic-btn">
+        <button class="control-container" id="mic-btn" onClick="toggleMic()">
             <img src="icons/mic.png" />
-        </div>
+        </button>
 
         <a href="lobby.html">
             <div class="control-container" id="leave-btn">

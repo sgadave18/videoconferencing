@@ -24,6 +24,8 @@ if (authUsers.includes(uid)) {
 
 let localStream;
 let remoteStream;
+
+
 const servers = {
     iceServers: [
         {
@@ -31,10 +33,8 @@ const servers = {
         }
     ]
 }
-let peerConnection = new RTCPeerConnection(servers);
 
-
-
+let peerConnection;
 
 let constraints = {
     video: {
@@ -94,6 +94,8 @@ let handleUserJoined = async (MemberId) => {
 
 
 let createPeerConnection = async (MemberId) => {
+
+    peerConnection = new RTCPeerConnection(servers)
     remoteStream = new MediaStream()
     document.getElementById('user-2').srcObject = remoteStream
     document.getElementById('user-2').style.display = 'block'
@@ -159,7 +161,7 @@ let leaveChannel = async () => {
 
 let toggleCamera = async () => {
     let videoTrack = localStream.getTracks().find(track => track.kind === 'video')
-
+    console.log("Video TRACK",videoTrack)
     if (videoTrack.enabled) {
         videoTrack.enabled = false
         document.getElementById('camera-btn').style.backgroundColor = 'rgb(255, 80, 80)'
@@ -170,8 +172,9 @@ let toggleCamera = async () => {
 }
 
 let toggleMic = async () => {
+    
     let audioTrack = localStream.getTracks().find(track => track.kind === 'audio')
-
+    console.log("AUDIO TRACK",audioTrack)
     if (audioTrack.enabled) {
         audioTrack.enabled = false
         document.getElementById('mic-btn').style.backgroundColor = 'rgb(255, 80, 80)'
@@ -182,7 +185,8 @@ let toggleMic = async () => {
 }
 
 window.addEventListener('beforeunload', leaveChannel)
-document.getElementById('camera-btn').addEventListener('click', toggleCamera)
-document.getElementById('mic-btn').addEventListener('click', toggleMic)
+
+// document.getElementById('camera-btn').setAttribute('onclick', `${toggleCamera}`)
+// document.getElementById('mic-btn').setAttribute('onclick', `${toggleMic}`)
 
 init()
