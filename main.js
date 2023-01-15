@@ -1,8 +1,9 @@
 let APP_ID = "38f99d48b8054706bb4ba6d7c03845ae"
 
+let authUsers = ['Swapnil','Swappy']
 
 let token = null;
-let uid = String(Math.floor(Math.random() * 10000))
+
 
 let client;
 let channel;
@@ -10,9 +11,15 @@ let channel;
 let queryString = window.location.search
 let urlParams = new URLSearchParams(queryString)
 let roomId = urlParams.get('room')
+let uid = urlParams.get('uid')
 
 if(!roomId){
     window.location = 'lobby.html'
+    window.location = 'lobby.html'
+}
+
+if(authUsers.includes(uid)){
+    console.log(uid);
 }
 
 let localStream;
