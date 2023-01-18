@@ -89,6 +89,7 @@ let init = async () => {
 let createPeerConnection = async (MemberId) => {
 
     peerConnection = new RTCPeerConnection(servers)
+    console.log("Peer Connection ",peerConnection)
     remoteStream = new MediaStream()
     document.getElementById('user-2').srcObject = remoteStream
     document.getElementById('user-2').style.display = 'block'
